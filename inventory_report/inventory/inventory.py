@@ -1,35 +1,34 @@
 from inventory_report.reports.simple_report import SimpleReport
 from inventory_report.reports.complete_report import CompleteReport
-import csv
-import json
-import xmltodict
+from inventory_report.importer.csv_importer import CsvImporter
+from inventory_report.importer.json_importer import JsonImporter
+from inventory_report.importer.xml_importer import XmlImporter
 
 
 class Inventory:
 
-    def csv_report(report, report_type):
-        response = csv.DictReader(report)
+    def csv_report(file, report_type):
+        response = CsvImporter.import_data(file)
         if report_type == 'simples':
-            return SimpleReport.generate(list(response))
-        return CompleteReport.generate(list(response))
+            return SimpleReport.generate(response)
+        return CompleteReport.generate(response)
 
-    def json_report(report, report_type):
-        content = json.load(report)
+    def json_report(file, report_type):
+        content = JsonImporter.import_data(file)
         if report_type == 'simples':
-            return SimpleReport.generate(list(content))
-        return CompleteReport.generate(list(content))
+            return SimpleReport.generate(content)
+        return CompleteReport.generate(content)
 
-    def xml_report(report, report_type):
-        xml_content = xmltodict.parse(report.read())["dataset"]["record"]
+    def xml_report(file, report_type):
+        xml_content = XmlImporter.import_data(file)
         if report_type == 'simples':
-            return SimpleReport.generate(list(xml_content))
-        return CompleteReport.generate(list(xml_content))
+            return SimpleReport.generate(xml_content)
+        return CompleteReport.generate(xml_content)
 
     @staticmethod
     def import_data(path: str, report_type: str):
-        with open(path) as report:
-            if '.csv' in path:
-                return Inventory.csv_report(report, report_type)
-            elif '.json' in path:
-                return Inventory.json_report(report, report_type)
-            return Inventory.xml_report(report, report_type)
+        if '.csv' in path:
+            return Inventory.csv_report(path, report_type)
+        elif '.json' in path:
+            return Inventory.json_report(path, report_type)
+        return Inventory.xml_report(path, report_type)
