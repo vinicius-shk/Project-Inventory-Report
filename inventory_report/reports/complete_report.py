@@ -20,5 +20,4 @@ class CompleteReport(SimpleReport):
             comp_quant += f'- {key}: {value}\n'
         return f'''{superclass_ret}
 Produtos estocados por empresa:
-{comp_quant}
-        '''
+{comp_quant}'''
